@@ -1,6 +1,8 @@
+using System.Numerics;
 using Platformer.Core;
 using Platformer.Mechanics;
 using Platformer.Model;
+using UnityEngine;
 
 namespace Platformer.Gameplay
 {
@@ -17,8 +19,19 @@ namespace Platformer.Gameplay
 
         public override void Execute()
         {
-            model.player.animator.SetTrigger("victory");
             model.player.controlEnabled = false;
+            var rb = model.player.GetComponent<Rigidbody2D>();
+            model.player.StartCoroutine(VictoryJump(rb));
+        }
+
+        private System.Collections.IEnumerator VictoryJump(Rigidbody2D rb)
+        {
+            while (true)
+            {
+                rb.linearVelocity = new UnityEngine.Vector2(0, 5f);
+                model.player.animator.SetTrigger("victory");
+                yield return new WaitForSeconds(0.8f);
+            }
         }
     }
 }
