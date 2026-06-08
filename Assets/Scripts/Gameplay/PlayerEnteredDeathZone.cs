@@ -16,7 +16,15 @@ namespace Platformer.Gameplay
 
         public override void Execute()
         {
-            Simulation.Schedule<PlayerDeath>(0);
+            var player = model.player;
+            player.health.Die();
+            model.virtualCamera.Follow = null;
+            model.virtualCamera.LookAt = null;
+            player.controlEnabled = false;
+            player.animator.SetTrigger("hurt");
+            player.animator.SetBool("dead", true);
+            var spawnEvent = Simulation.Schedule<PlayerSpawn>(2);
+            spawnEvent.isDeath = true;
         }
     }
 }
