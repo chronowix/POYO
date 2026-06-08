@@ -14,22 +14,31 @@ namespace Platformer.Gameplay
     {
         PlatformerModel model = Simulation.GetModel<PlatformerModel>();
 
-        public override void Execute()
+public override void Execute()
         {
             var player = model.player;
             if (player.health.IsAlive)
             {
-                player.health.Die();
-                model.virtualCamera.Follow = null;
-                model.virtualCamera.LookAt = null;
-                // player.collider.enabled = false;
-                player.controlEnabled = false;
+                player.health.Decrement();
 
                 if (player.audioSource && player.ouchAudio)
                     player.audioSource.PlayOneShot(player.ouchAudio);
-                player.animator.SetTrigger("hurt");
-                player.animator.SetBool("dead", true);
-                Simulation.Schedule<PlayerSpawn>(2);
+
+                if (!player.health.IsAlive){
+                    // si plus de hp
+                    model.virtualCamera.Follow = null;
+                    model.virtualCamera.LookAt = null;
+                    player.controlEnabled = false;
+                    player.animator.SetTrigger("hurt");
+                    player.animator.SetBool("dead", true);
+                    var spawnEvent = Simulation.Schedule<PlayerSpawn>(2);
+                    spawnEvent.isDeath = true;
+                }
+                else{
+                    player.animator.SetTrigger("hurt");
+                    var hurtEvent = Simulation.Schedule<PlayerSpawn>(0.5f);
+                    hurtEvent.isDeath = false;
+                }
             }
         }
     }
