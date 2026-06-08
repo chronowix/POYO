@@ -67,6 +67,6 @@
         "*.sln": "*.csproj",
         "*.slnx": "*.csproj"
     },
-    "dotnet.defaultSolution": "POYO.slnx",
+    "dotnet.defaultSolution": "POYO!.slnx",
     "dotnet.enableWorkspaceBasedDevelopment": false
 }
