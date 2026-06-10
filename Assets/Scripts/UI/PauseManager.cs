@@ -77,8 +77,12 @@ namespace Platformer.UI
 
         public void QuitGame()
         {
+            #if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+            #else
             Time.timeScale = 1f;
             Application.Quit();
+            #endif
         }
     }
 }
