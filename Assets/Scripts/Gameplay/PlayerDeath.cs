@@ -21,11 +21,13 @@ public override void Execute()
             {
                 player.health.Decrement();
 
-                if (player.audioSource && player.ouchAudio)
-                    player.audioSource.PlayOneShot(player.ouchAudio);
-
                 if (!player.health.IsAlive){
-                    // si plus de hp
+                    // si plus de hp - MORT
+                    player.DestroyWeapon();
+                    
+                    if (player.audioSource && player.deathAudio) 
+                        player.audioSource.PlayOneShot(player.deathAudio);
+
                     model.virtualCamera.Follow = null;
                     model.virtualCamera.LookAt = null;
                     player.controlEnabled = false;
@@ -35,6 +37,10 @@ public override void Execute()
                     spawnEvent.isDeath = true;
                 }
                 else{
+                    // Toujours en vie - DEGATS UNIQUEMENT
+                    if (player.audioSource && player.ouchAudio)
+                        player.audioSource.PlayOneShot(player.ouchAudio);
+
                     player.animator.SetTrigger("hurt");
                     var hurtEvent = Simulation.Schedule<PlayerSpawn>(0.5f);
                     hurtEvent.isDeath = false;
