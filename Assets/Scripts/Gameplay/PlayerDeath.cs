@@ -17,6 +17,10 @@ namespace Platformer.Gameplay
 public override void Execute()
         {
             var player = model.player;
+
+            // Si le joueur est invincible, on ignore les dégâts
+            if (player.IsInvincible && player.health.IsAlive) return;
+
             if (player.health.IsAlive)
             {
                 player.health.Decrement();
@@ -44,6 +48,9 @@ public override void Execute()
                     player.animator.SetTrigger("hurt");
                     var hurtEvent = Simulation.Schedule<PlayerSpawn>(0.5f);
                     hurtEvent.isDeath = false;
+
+                    // On active l'invincibilité après avoir pris un coup
+                    player.StartInvincibility();
                 }
             }
         }

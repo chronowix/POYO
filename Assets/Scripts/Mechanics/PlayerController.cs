@@ -50,6 +50,10 @@ namespace Platformer.Mechanics
         private bool isAfk = false;
 
         public Weapon equippedWeapon;
+        
+        public float invincibilityDuration = 1.5f;
+        private float invincibilityTimer = 0f;
+        public bool IsInvincible => invincibilityTimer > 0;
 
         public void HideWeapon()
         {
@@ -124,7 +128,29 @@ namespace Platformer.Mechanics
                 animator.SetBool("isAfk", false);
             }
             UpdateJumpState();
+
+            // Gestion de l'invincibilité
+            if (invincibilityTimer > 0)
+            {
+                invincibilityTimer -= Time.deltaTime;
+                
+                // Effet de clignotement
+                float blinkSpeed = 10f;
+                float alpha = Mathf.PingPong(Time.time * blinkSpeed, 1.0f);
+                spriteRenderer.color = new Color(1, 1, 1, alpha > 0.5f ? 1f : 0.2f);
+
+                if (invincibilityTimer <= 0)
+                {
+                    spriteRenderer.color = Color.white; // Reset la couleur
+                }
+            }
+
             base.Update();
+        }
+
+        public void StartInvincibility()
+        {
+            invincibilityTimer = invincibilityDuration;
         }
 
         void UpdateJumpState()
@@ -181,7 +207,9 @@ namespace Platformer.Mechanics
                     Vector3 offset = equippedWeapon.gripOffset;
                     offset.z = 0; // Force Z à 0
                     equippedWeapon.transform.localPosition = offset;
-                    equippedWeapon.transform.localScale = new Vector3(1, 1, 1);
+                    
+                    float s = equippedWeapon.currentScaleMultiplier;
+                    equippedWeapon.transform.localScale = new Vector3(s, s, 1);
                 }
             }
             else if (move.x < -0.01f)
@@ -193,7 +221,9 @@ namespace Platformer.Mechanics
                     flippedOffset.x *= -1;
                     flippedOffset.z = 0; // Force Z à 0
                     equippedWeapon.transform.localPosition = flippedOffset;
-                    equippedWeapon.transform.localScale = new Vector3(-1, 1, 1);
+                    
+                    float s = equippedWeapon.currentScaleMultiplier;
+                    equippedWeapon.transform.localScale = new Vector3(-s, s, 1);
                 }
             }
 

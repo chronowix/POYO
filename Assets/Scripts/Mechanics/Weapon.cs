@@ -16,6 +16,10 @@ namespace Platformer.Mechanics
         public Vector2 attackOffset = new Vector2(0.5f, 0); 
         public LayerMask enemyLayer; // À configurer dans l'inspecteur (choisir "Enemies" ou "Default")
         
+        [Header("Bonus Drôle")]
+        public float currentScaleMultiplier = 1f;
+        public float growthPerKill = 0.5f;
+        
         private float nextAttackTime = 0f;
         private SpriteRenderer spriteRenderer;
 
@@ -57,12 +61,17 @@ namespace Platformer.Mechanics
                         {
                             health.Decrement();
                             Debug.Log("SUCCESS! Hit " + enemy.name + ". Health: " + health.CurrentHP + "/" + health.maxHP);
-                            if (!health.IsAlive) Schedule<EnemyDeath>().enemy = enemy;
+                            if (!health.IsAlive) 
+                            {
+                                currentScaleMultiplier += growthPerKill;
+                                Schedule<EnemyDeath>().enemy = enemy;
+                            }
                         }
                         else
                         {
                             // Si pas de script Health, on tue l'ennemi directement
                             Debug.Log("No Health component found, killing " + enemy.name + " instantly!");
+                            currentScaleMultiplier += growthPerKill;
                             Schedule<EnemyDeath>().enemy = enemy;
                         }
                     }

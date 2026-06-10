@@ -11,7 +11,9 @@ namespace Platformer.Mechanics
     {
         void OnTriggerEnter2D(Collider2D collider)
         {
-            var p = collider.gameObject.GetComponentInParent<PlayerController>();
+            // On vérifie si l'objet qui touche a DIRECTEMENT le PlayerController
+            // Cela permet d'ignorer l'épée géante qui est un enfant du joueur
+            var p = collider.gameObject.GetComponent<PlayerController>();
             if (p != null)
             {
                 var ev = Schedule<PlayerEnteredVictoryZone>();
