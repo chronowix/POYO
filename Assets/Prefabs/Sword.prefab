@@ -109,11 +109,14 @@ MonoBehaviour:
   damage: 1
   attackRange: 0.2
   attackCooldown: 0.1
-  gripOffset: {x: 0.9, y: 0.4, z: 1}
+  gripOffset: {x: 1, y: 0.4, z: 1}
   attackOffset: {x: 0.5, y: 0}
   enemyLayer:
     serializedVersion: 2
     m_Bits: 4294967295
+  currentScaleMultiplier: 1
+  growthPerKill: 0.5
+  hitAudio: {fileID: 8300000, guid: a974cb2af7c85d7ccad72b603779ef45, type: 3}
 --- !u!61 &4779949547494785145
 BoxCollider2D:
   m_ObjectHideFlags: 0

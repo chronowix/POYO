@@ -19,6 +19,10 @@ namespace Platformer.Mechanics
         [Header("Bonus Drôle")]
         public float currentScaleMultiplier = 1f;
         public float growthPerKill = 0.5f;
+
+        [Header("Audio")]
+        public AudioClip hitAudio;
+        private AudioSource audioSource;
         
         private float nextAttackTime = 0f;
         private SpriteRenderer spriteRenderer;
@@ -26,7 +30,18 @@ namespace Platformer.Mechanics
         void Awake()
         {
             spriteRenderer = GetComponent<SpriteRenderer>();
-            // Par défaut, si on n'a pas réglé le layer, on cherche partout sauf le joueur
+            audioSource = GetComponent<AudioSource>();
+            if (audioSource == null) audioSource = gameObject.AddComponent<AudioSource>();
+            
+            // MÉTHODE RADICALE : On détruit tous les colliders de l'épée.
+            // Sans collider, l'épée n'existe pas pour le système de trigger de victoire.
+            // On utilise quand même OverlapCircle pour les dégâts, qui n'a pas besoin de collider sur l'objet lui-même.
+            var colliders = GetComponents<Collider2D>();
+            foreach (var col in colliders) Destroy(col);
+            
+            var childColliders = GetComponentsInChildren<Collider2D>();
+            foreach (var col in childColliders) Destroy(col);
+
             if (enemyLayer == 0) enemyLayer = ~LayerMask.GetMask("Player");
         }
 
@@ -54,6 +69,9 @@ namespace Platformer.Mechanics
                     var enemy = col.GetComponentInParent<EnemyController>();
                     if (enemy != null)
                     {
+                        // Jouer le son d'impact de l'épée
+                        if (hitAudio != null && audioSource != null) audioSource.PlayOneShot(hitAudio);
+
                         var health = enemy.GetComponent<Health>();
                         if (health == null) health = enemy.GetComponentInChildren<Health>();
 
@@ -64,7 +82,9 @@ namespace Platformer.Mechanics
                             if (!health.IsAlive) 
                             {
                                 currentScaleMultiplier += growthPerKill;
-                                Schedule<EnemyDeath>().enemy = enemy;
+                                var ev = Schedule<EnemyDeath>();
+                                ev.enemy = enemy;
+                                ev.playAudio = false; // L'épée fait déjà son son
                             }
                         }
                         else
@@ -72,7 +92,9 @@ namespace Platformer.Mechanics
                             // Si pas de script Health, on tue l'ennemi directement
                             Debug.Log("No Health component found, killing " + enemy.name + " instantly!");
                             currentScaleMultiplier += growthPerKill;
-                            Schedule<EnemyDeath>().enemy = enemy;
+                            var ev = Schedule<EnemyDeath>();
+                            ev.enemy = enemy;
+                            ev.playAudio = false; // L'épée fait déjà son son
                         }
                     }
                     else

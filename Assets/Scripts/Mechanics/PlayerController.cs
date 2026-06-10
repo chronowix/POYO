@@ -204,9 +204,8 @@ namespace Platformer.Mechanics
                 spriteRenderer.flipX = false;
                 if (equippedWeapon != null) 
                 {
-                    Vector3 offset = equippedWeapon.gripOffset;
-                    offset.z = 0; // Force Z à 0
-                    equippedWeapon.transform.localPosition = offset;
+                    // On garde l'offset original
+                    equippedWeapon.transform.localPosition = equippedWeapon.gripOffset;
                     
                     float s = equippedWeapon.currentScaleMultiplier;
                     equippedWeapon.transform.localScale = new Vector3(s, s, 1);
@@ -217,12 +216,13 @@ namespace Platformer.Mechanics
                 spriteRenderer.flipX = true;
                 if (equippedWeapon != null) 
                 {
+                    // On inverse l'offset X
                     Vector3 flippedOffset = equippedWeapon.gripOffset;
                     flippedOffset.x *= -1;
-                    flippedOffset.z = 0; // Force Z à 0
                     equippedWeapon.transform.localPosition = flippedOffset;
                     
                     float s = equippedWeapon.currentScaleMultiplier;
+                    // On inverse le scale X pour l'orientation, mais on garde le multiplicateur
                     equippedWeapon.transform.localScale = new Vector3(-s, s, 1);
                 }
             }

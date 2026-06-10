@@ -1300,6 +1300,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b641e1502a4fe1e493ab2ac903bd1ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Platformer.UI.MainMenuController
+  clickAudio: {fileID: 8300000, guid: 47d1d3cb0e3a131918dad1c8b03ef484, type: 3}
 --- !u!4 &1933911552
 Transform:
   m_ObjectHideFlags: 0
