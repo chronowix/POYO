@@ -1,30 +1,29 @@
-using System.Numerics;
 using Platformer.Core;
 using Platformer.Mechanics;
 using Platformer.Model;
 using UnityEngine;
+using Platformer.UI;
 
 namespace Platformer.Gameplay
 {
-
-    /// <summary>
-    /// This event is triggered when the player character enters a trigger with a VictoryZone component.
-    /// </summary>
-    /// <typeparam name="PlayerEnteredVictoryZone"></typeparam>
     public class PlayerEnteredVictoryZone : Simulation.Event<PlayerEnteredVictoryZone>
     {
         public VictoryZone victoryZone;
 
         PlatformerModel model = Simulation.GetModel<PlatformerModel>();
-        
-        private bool victoryMusicPlayed = false;
 
         public override void Execute()
         {
-            if (victoryMusicPlayed) return;
-            victoryMusicPlayed = true;
-            
+            Debug.Log("VictoryZone triggered!");
+
+            if (!model.player.controlEnabled) return;
+
             model.player.controlEnabled = false;
+
+            var pauseManager = GameObject.FindFirstObjectByType<PauseManager>();
+            if (pauseManager != null)
+                pauseManager.ShowVictory();
+
             model.player.animator.SetTrigger("victory");
 
             var audioSource = GameObject.FindFirstObjectByType<GameController>()?.GetComponent<AudioSource>();

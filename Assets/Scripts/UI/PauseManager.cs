@@ -20,9 +20,11 @@ namespace Platformer.UI
         {
             pauseMenu.SetActive(false);
             controlsMenu.SetActive(false);
-            volumeSlider.value = 1f;
+            if (victoryPanel != null) victoryPanel.SetActive(false);
             AudioListener.volume = 1f;
+            volumeSlider.value = 1f;
             isInitialized = true;
+            Time.timeScale = 1f;
         }
 
         public void SetVolume(float volume)
@@ -72,6 +74,19 @@ namespace Platformer.UI
         {
             controlsMenu.SetActive(false);
             pauseMenu.SetActive(true);
+        }
+
+        public GameObject victoryPanel;
+
+        public void ShowVictory()
+        {
+            victoryPanel.SetActive(true);
+        }
+
+        public void RestartLevel()
+        {
+            Time.timeScale = 1f;
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
 
 
