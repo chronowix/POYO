@@ -6,11 +6,6 @@ using static Platformer.Core.Simulation;
 
 namespace Platformer.Gameplay
 {
-
-    /// <summary>
-    /// Fired when a Player collides with an Enemy.
-    /// </summary>
-    /// <typeparam name="EnemyCollision"></typeparam>
     public class PlayerEnemyCollision : Simulation.Event<PlayerEnemyCollision>
     {
         public EnemyController enemy;
@@ -20,7 +15,8 @@ namespace Platformer.Gameplay
 
         public override void Execute()
         {
-            var willHurtEnemy = player.GetComponent<Rigidbody2D>().linearVelocity.y <= 0 && player.Bounds.min.y >= enemy.Bounds.max.y - 0.3f;
+            var willHurtEnemy = player.GetComponent<Rigidbody2D>().linearVelocity.y <= 0 
+                                && player.Bounds.min.y >= enemy.Bounds.max.y - 0.3f;
 
             if (willHurtEnemy)
             {
@@ -31,7 +27,6 @@ namespace Platformer.Gameplay
                     if (!enemyHealth.IsAlive)
                     {
                         Schedule<EnemyDeath>().enemy = enemy;
-                        Debug.Log("BOUNCE");
                         player.Bounce(2);
                     }
                     else
@@ -42,7 +37,6 @@ namespace Platformer.Gameplay
                 else
                 {
                     Schedule<EnemyDeath>().enemy = enemy;
-                    Debug.Log("BOUNCE");
                     player.Bounce(2);
                 }
             }

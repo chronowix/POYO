@@ -13,11 +13,15 @@ namespace Platformer.Gameplay
         public DeathZone deathzone;
 
         PlatformerModel model = Simulation.GetModel<PlatformerModel>();
-
         public override void Execute()
         {
             var player = model.player;
             player.health.Die();
+            player.DestroyWeapon();
+            
+            if (player.audioSource && player.deathAudio)
+                player.audioSource.PlayOneShot(player.deathAudio);
+
             model.virtualCamera.Follow = null;
             model.virtualCamera.LookAt = null;
             player.controlEnabled = false;

@@ -9,10 +9,6 @@ using UnityEngine.InputSystem;
 
 namespace Platformer.Mechanics
 {
-    /// <summary>
-    /// This is the main class used to implement control of the player.
-    /// It is a superset of the AnimationController class, but is inlined to allow for any kind of customisation.
-    /// </summary>
     public class PlayerController : KinematicObject
     {
         public AudioClip jumpAudio;
@@ -20,17 +16,13 @@ namespace Platformer.Mechanics
         public AudioClip deathAudio;
         public AudioClip victoryAudio;
 
-
-        // Max horizontal speed of the player.
         public float maxSpeed = 7;
-
-        // Initial jump velocity at the start of a jump.
         public float jumpTakeOffSpeed = 7;
 
         public JumpState jumpState = JumpState.Grounded;
         private bool stopJump;
-        /*internal new*/ public Collider2D collider2d;
-        /*internal new*/ public AudioSource audioSource;
+        public Collider2D collider2d;
+        public AudioSource audioSource;
         public Health health;
         public bool controlEnabled = true;
 
@@ -42,15 +34,16 @@ namespace Platformer.Mechanics
 
         private InputAction m_MoveAction;
         private InputAction m_JumpAction;
+        private InputAction m_AttackAction;
 
         public Bounds Bounds => collider2d.bounds;
 
         private float afkTimer = 0f;
-        public float afkDelay = 5f; // secondes avant l'AFK
+        public float afkDelay = 5f;
         private bool isAfk = false;
 
         public Weapon equippedWeapon;
-        
+
         public float invincibilityDuration = 1.5f;
         private float invincibilityTimer = 0f;
         public bool IsInvincible => invincibilityTimer > 0;
@@ -67,7 +60,7 @@ namespace Platformer.Mechanics
 
         public void DestroyWeapon()
         {
-            if (equippedWeapon != null) 
+            if (equippedWeapon != null)
             {
                 Destroy(equippedWeapon.gameObject);
                 equippedWeapon = null;
@@ -84,9 +77,11 @@ namespace Platformer.Mechanics
 
             m_MoveAction = InputSystem.actions.FindAction("Player/Move");
             m_JumpAction = InputSystem.actions.FindAction("Player/Jump");
-            
+            m_AttackAction = InputSystem.actions.FindAction("Player/Attack");
+
             m_MoveAction.Enable();
             m_JumpAction.Enable();
+            m_AttackAction.Enable();
         }
 
         protected override void Update()
@@ -94,6 +89,7 @@ namespace Platformer.Mechanics
             if (controlEnabled)
             {
                 move.x = m_MoveAction.ReadValue<Vector2>().x;
+
                 if (jumpState == JumpState.Grounded && m_JumpAction.WasPressedThisFrame())
                     jumpState = JumpState.PrepareToJump;
                 else if (m_JumpAction.WasReleasedThisFrame())
@@ -102,7 +98,7 @@ namespace Platformer.Mechanics
                     Schedule<PlayerStopJump>().player = this;
                 }
 
-                if (Keyboard.current.eKey.wasPressedThisFrame && equippedWeapon != null)
+                if (m_AttackAction.WasPressedThisFrame() && equippedWeapon != null)
                 {
                     equippedWeapon.Attack();
                 }
@@ -111,6 +107,7 @@ namespace Platformer.Mechanics
             {
                 move.x = 0;
             }
+
             // Timer AFK
             if (move.x == 0 && IsGrounded)
             {
@@ -127,22 +124,20 @@ namespace Platformer.Mechanics
                 isAfk = false;
                 animator.SetBool("isAfk", false);
             }
+
             UpdateJumpState();
 
             // Gestion de l'invincibilité
             if (invincibilityTimer > 0)
             {
                 invincibilityTimer -= Time.deltaTime;
-                
-                // Effet de clignotement
+
                 float blinkSpeed = 10f;
                 float alpha = Mathf.PingPong(Time.time * blinkSpeed, 1.0f);
                 spriteRenderer.color = new Color(1, 1, 1, alpha > 0.5f ? 1f : 0.2f);
 
                 if (invincibilityTimer <= 0)
-                {
-                    spriteRenderer.color = Color.white; // Reset la couleur
-                }
+                    spriteRenderer.color = Color.white;
             }
 
             base.Update();
@@ -194,19 +189,15 @@ namespace Platformer.Mechanics
             {
                 stopJump = false;
                 if (velocity.y > 0)
-                {
                     velocity.y = velocity.y * model.jumpDeceleration;
-                }
             }
 
             if (move.x > 0.01f)
             {
                 spriteRenderer.flipX = false;
-                if (equippedWeapon != null) 
+                if (equippedWeapon != null)
                 {
-                    // On garde l'offset original
                     equippedWeapon.transform.localPosition = equippedWeapon.gripOffset;
-                    
                     float s = equippedWeapon.currentScaleMultiplier;
                     equippedWeapon.transform.localScale = new Vector3(s, s, 1);
                 }
@@ -214,15 +205,12 @@ namespace Platformer.Mechanics
             else if (move.x < -0.01f)
             {
                 spriteRenderer.flipX = true;
-                if (equippedWeapon != null) 
+                if (equippedWeapon != null)
                 {
-                    // On inverse l'offset X
                     Vector3 flippedOffset = equippedWeapon.gripOffset;
                     flippedOffset.x *= -1;
                     equippedWeapon.transform.localPosition = flippedOffset;
-                    
                     float s = equippedWeapon.currentScaleMultiplier;
-                    // On inverse le scale X pour l'orientation, mais on garde le multiplicateur
                     equippedWeapon.transform.localScale = new Vector3(-s, s, 1);
                 }
             }
