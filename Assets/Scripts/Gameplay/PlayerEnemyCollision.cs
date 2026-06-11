@@ -15,8 +15,7 @@ namespace Platformer.Gameplay
 
         public override void Execute()
         {
-            var willHurtEnemy = player.GetComponent<Rigidbody2D>().linearVelocity.y <= 0 
-                                && player.Bounds.min.y >= enemy.Bounds.max.y - 0.3f;
+            var willHurtEnemy = player.GetComponent<Rigidbody2D>().linearVelocity.y <= 0 && player.Bounds.min.y >= enemy.Bounds.max.y - 0.3f;
 
             if (willHurtEnemy)
             {
